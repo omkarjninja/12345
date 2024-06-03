@@ -6,64 +6,212 @@
     <title>Document</title>
   </head>
   <body>
-    <h1>1. What is implicit conversion? Give an example.</h1>
-    <br />
-    <p>
-      Implicit conversion in Python refers to the automatic conversion of one
-      data type to another by the Python interpreter without explicit
-      instruction from the programmer. This typically occurs when an operation
-      or expression involving different data types is performed, and Python
-      automatically converts the data types to make the operation valid.
-    </p>
-    <br />
-    <p>x = 5 y = 2.5 float result = x + y print(result) Output: 7.5</p>
-    <br />
-    <h1>
-      Write a short note on conditional branching statements supported by Python
-    </h1>
-    <br />
-    <p>
-      if statements: The 'if' statement is the most basic form of conditional
-      branching in Python. It allows a block of code to be executed only if a
-      specified condition is true. If the condition evaluates to false, the
-      block of code is simply skipped.
-      <br />
-      if-else statements: The 'if-else' statement extends the functionality of
-      the 'if' statement by providing an alternative block of code to execute
-      when the condition evaluates to false. This construct enables the program
-      to make binary decisions based on the truth value of the condition.
-      <br />
-      if-elif-else statements: The 'if-elif-else' statement allows for the
-      evaluation of multiple conditions in sequence. It provides a series of
-      conditions to test, and the corresponding block of code associated with
-      the first true condition is executed. This construct is particularly
-      useful when there are several mutually exclusive conditions to consider.
-      <br />
-      Nested if statements: Nested if statements involve placing one 'if'
-      statement inside another. This allows for more complex branching logic by
-      creating hierarchical conditions. Nested if statements can be used to
-      implement multi-level decision-making processes.
-    </p>
-    <br />
-    <h1>
-      Can a function call another function? Justify your answer with the help of
-      an example
-    </h1>
-    <br />
-    <p>
-      Yes, in Python, a function can call another function. This is a common and
-      useful practice in programming, especially for organizing code into
-      smaller, reusable components. When one function calls another function, it
-      means that the execution of the program moves from the calling function to
-      the called function, and once the called function completes its execution,
-      the control returns back to the calling function.
-    </p>
-    <br />
-    <p>
-      def greet(): print("Hello!") <br />def main(): print("Start of main
-      function.") greet() # Calling the greet function from within the main
-      function print("End of main function.") # Call the main function to start
-      the program main()
-    </p>
+   <p>
+main Activity 
+
+
+package com.example.tomexam;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity {
+    EditText name,roll;
+    Spinner spi;
+    RadioGroup rg;
+    RadioButton rb;
+    ImageView date;
+    Button ins,dis,city;
+    String place[]={"Banglore","mumbai","Goa"};
+    String selectedcity,selecteddate;
+    DBhandler db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        name=findViewById(R.id.name);
+        roll=findViewById((R.id.rolll));
+        spi=findViewById(R.id.spinner);
+        rg=findViewById(R.id.rg);
+        date=findViewById(R.id.date);
+        ins=findViewById(R.id.insert);
+        dis=findViewById(R.id.display);
+        city=findViewById(R.id.city);
+        db=new DBhandler(getApplicationContext(),"SBD",null,1);
+        ArrayAdapter adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,place);
+        spi.setAdapter(adapter);
+        spi.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedcity=parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                rb=findViewById(checkedId);
+            }
+        });
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar dod=Calendar.getInstance();
+                int day=dod.get(Calendar.DATE);
+                int month=dod.get(Calendar.MONTH);
+                int year=dod.get(Calendar.YEAR);
+                DatePickerDialog dialog=new DatePickerDialog(MainActivity.this, android.R.style.Theme_DeviceDefault_DialogWhenLarge, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        selecteddate=dayOfMonth+"/"+(month+1)+"/"+year;
+                    }
+                },year,month,day);
+                dialog.show();
+            }
+        });
+        ins.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String a=name.getText().toString();
+                String b=roll.getText().toString();
+                String c=spi.toString();
+                String d=rg.toString();
+                String e=rg.toString();
+                db.insert(a,b,c,d,e);
+
+
+            }
+        });
+        dis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String rec=db.display();
+                Intent it=new Intent(MainActivity.this,result.class);
+                it.putExtra("a",rec);
+                startActivity(it);
+
+
+            }
+        });
+        city.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+
+    }
+}
+
+
+
+******Result Activity  
+
+
+package com.example.tomexam;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class result extends AppCompatActivity {
+    TextView result;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_result);
+        result=findViewById(R.id.result);
+        Intent it=getIntent();
+        String a=it.getStringExtra("a");
+        result.setText(a);
+    }
+}
+
+
+
+Data Base Code
+
+
+
+package com.example.tomexam;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.Nullable;
+
+public class DBhandler extends SQLiteOpenHelper {
+    public DBhandler(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, "SBD", factory, 1);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("create table student(name varchar(20),roll varchar(20),city varchar(20),gender varchar (20),date varchar(20),)");
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+    public void insert(String name,String roll,String city,String gender,String date){
+        SQLiteDatabase db=this.getWritableDatabase();
+        db.execSQL("insert into student values(?,?,?,?,?)",new String[]{name,roll,city,gender,date});
+        db.close();
+    }
+    public String display(){
+        String tdata="";
+        SQLiteDatabase db=this.getReadableDatabase();
+        Cursor cr=db.rawQuery("select * from student",null);
+        while (cr.moveToNext()){
+            String a=cr.getString(0);
+            String b=cr.getString(1);
+            String c=cr.getString(2);
+            String d=cr.getString(3);
+            String e=cr.getString(4);
+            tdata+=a+b+c+d+e;
+        }
+        return tdata;
+
+    }
+}
+
+
+
+
+
+
+
+
+     
+   </p>
   </body>
 </html>
